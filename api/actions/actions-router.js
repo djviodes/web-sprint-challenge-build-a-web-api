@@ -5,7 +5,7 @@ const Actions = require('./actions-model')
 function validateAction(req, res, next) {
     if (!req.body.project_id || !req.body.description || !req.body.notes) {
         res.status(400).json({
-            message: 'Give us what we asked for... now'
+            message: 'Give us what we asked for... now...'
         })
     } else {
         next();
@@ -17,9 +17,12 @@ router.get('/', (req, res) => {
     .then(data => {
       res.status(200).json(data)
     })
-    .catch(error => {
-      console.log(error)
-      res.status(500).json({ message: 'Error retrieving the actions' })
+    .catch(err => {
+      console.log(err)
+      res.status(500).json({
+        message: err.message,
+        stack: err.stack
+      })
     })
 });
 
@@ -29,15 +32,18 @@ router.get('/:id', (req, res) => {
     .then(data => {
         if (!data) {
             res.status(404).json({
-                message: 'There is no user'
+                message: 'Give us a real ID before I make you give us a real ID.'
             })
         } else {
             res.status(200).json(data)
         }
     })
-    .catch(error => {
-      console.log(error)
-      res.status(500).json({ message: 'Error retrieving the actions with id: ' + id })
+    .catch(err => {
+      console.log(err)
+      res.status(500).json({
+        message: err.message,
+        stack: err.stack
+      })
     })
 });
 
@@ -46,9 +52,10 @@ router.post('/', [validateAction], (req, res) => {
     .then(data => {
       res.status(201).json(data);
     })
-    .catch(error => {
+    .catch(err => {
       res.status(500).json({
-        message: error.message
+        message: err.message,
+        stack: err.stack
       });
     });
 });
@@ -58,10 +65,11 @@ router.put('/:id', [validateAction], (req, res) => {
     .then(data => {
       res.status(200).json(data);
     })
-    .catch(error => {
-      console.log(error);
+    .catch(err => {
+      console.log(err);
       res.status(500).json({
-        message: 'Error updating the action',
+        message: err.message,
+        stack: err.stack
       });
     });
 });
@@ -71,10 +79,11 @@ router.delete('/:id', (req, res) => {
     .then(data => {
       res.status(204).end();
     })
-    .catch(error => {
-      console.log(error);
+    .catch(err => {
+      console.log(err);
       res.status(500).json({
-        message: 'Error removing the hub',
+        message: err.message,
+        stack: err.stack
       });
     });
 });

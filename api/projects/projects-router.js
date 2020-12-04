@@ -5,7 +5,7 @@ const Projects = require('./projects-model');
 function validateProject(req, res, next) {
     if (!req.body.name || !req.body.description) {
         res.status(400).json({
-            message: 'Give us what we asked for... now'
+            message: 'Give us what we asked for... now...'
         })
     } else {
         next();
@@ -17,10 +17,13 @@ router.get('/', (req, res) => {
         .then(data => {
             res.status(200).json(data)
         })
-        .catch(error => {
-            console.log(error)
-            res.status(500).json({ message: 'Error retrieving the projects' })
-        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                message: err.message,
+                stack: err.stack
+            });
+        });
 });
 
 router.get('/:id', (req, res) => {
@@ -35,10 +38,13 @@ router.get('/:id', (req, res) => {
                 })
             }
         })
-        .catch(error => {
-            console.log(error)
-            res.status(500).json({ message: 'Error retrieving the project with id: ' + id })
-        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                message: err.message,
+                stack: err.stack
+            });
+        });
 });
 
 router.post('/', [validateProject], (req, res) => {
@@ -46,10 +52,11 @@ router.post('/', [validateProject], (req, res) => {
         .then(data => {
             res.status(201).json(data);
         })
-        .catch(error => {
-            console.log(error);
+        .catch(err => {
+            console.log(err);
             res.status(500).json({
-                message: 'Error adding the project',
+                message: err.message,
+                stack: err.stack
             });
         });
 });
@@ -59,10 +66,11 @@ router.put('/:id', [validateProject], (req, res) => {
         .then(data => {
             res.status(200).json(data);
         })
-        .catch(error => {
-            console.log(error);
+        .catch(err => {
+            console.log(err);
             res.status(500).json({
-                message: 'Error updating the project',
+                message: err.message,
+                stack: err.stack
             });
         });
 });
@@ -74,14 +82,15 @@ router.delete('/:id', (req, res) => {
                 res.status(204).end();
             } else {
                 res.status(404).json({
-                    message: 'Give us a project!'
+                    message: `You're stuck with this project... FOREVER MUAHAHAHAHAH`
                 })
             }
         })
-        .catch(error => {
-            console.log(error);
+        .catch(err => {
+            console.log(err);
             res.status(500).json({
-                message: 'Error removing the hub',
+                message: err.message,
+                stack: err.stack
             });
         });
 });
@@ -91,10 +100,13 @@ router.get('/:id/actions', (req, res) => {
         .then(data => {
             res.status(200).json(data)
         })
-        .catch(error => {
-            console.log(error)
-            res.status(500).json({ message: 'Error retrieving the projects' })
-        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json({
+                message: err.message,
+                stack: err.stack
+            });
+        });
 });
 
 

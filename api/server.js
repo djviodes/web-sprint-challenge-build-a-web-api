@@ -5,8 +5,8 @@ const projectRouter = require('./projects/projects-router');
 
 const server = express();
 
-server.use('/actions', actionRouter);
-server.use('/projects', projectRouter);
+server.use('/api/actions', actionRouter);
+server.use('/api/projects', projectRouter);
 
 server.get('/', (req, res) => {
     res.send('Welcome to the API');

@@ -1,72 +1,84 @@
 const router = require('express').Router();
 
-const Actions = require('./actions-model');
-const db = require('../../data/dbConfig');
-
-function validateActionId(req, res, next) {
-    const { id } = req.params;
-    Actions.get(id)
-        .then(action => {
-            if (action) {
-                req.hub = action;
-                next();
-            } else {
-                res.status(404).json({
-                    message: `ID ${id} does not exist one bit!`
-                })
-            }
-        })
-        .catch(err => {
-            res.status(500).json({
-                message: err.message,
-                stack: err.stack
-            })
-        })
-}
+const Actions = require('./actions-model')
 
 function validateAction(req, res, next) {
-    console.log(req.body);
-    if (req.body === {}) {
-      res.status(400).json({ message: "missing action data" });
-    } else if (!req.body.project_id) {
-      res.status(400).json({ message: "missing required project id field" });
-    } else if (!req.body.description) {
-        res.status(400).json({ message: "missing required description field" });
-    } else if (!req.body.notes) {
-        res.status(400).json({ message: "missing required notes field" });
+    if (!req.body.project_id || !req.body.description || !req.body.notes) {
+        res.status(400).json({
+            message: 'Give us what we asked for... now'
+        })
     } else {
-      next();
+        next();
     }
-  }
+}
 
 router.get('/', (req, res) => {
-    db('actions')
-        .then(actions => {
-            res.status(200).json(actions)
-        })
-        .catch(err => {
-            res.status(500).json({
-                message: err.message,
-                stack: err.stack
-            });
-        });
+  Actions.get(req.query.id)
+    .then(data => {
+      res.status(200).json(data)
+    })
+    .catch(error => {
+      console.log(error)
+      res.status(500).json({ message: 'Error retrieving the actions' })
+    })
 });
 
-router.get('/:id', [validateActionId], (req, res) => {
-    res.status(200).json(req.hub);
-})
+router.get('/:id', (req, res) => {
+  const { id } = req.params
+  Actions.get(id)
+    .then(data => {
+        if (!data) {
+            res.status(404).json({
+                message: 'There is no user'
+            })
+        } else {
+            res.status(200).json(data)
+        }
+    })
+    .catch(error => {
+      console.log(error)
+      res.status(500).json({ message: 'Error retrieving the actions with id: ' + id })
+    })
+});
 
 router.post('/', [validateAction], (req, res) => {
-    Actions.insert(req.body)
-        .then(action => {
-            res.status(201).json(action);
-        })
-        .catch(err => {
-            res.status(500).json({
-                message: err.message,
-                stack: err.stack
-            })
-        })
-})
+  Actions.insert(req.body)
+    .then(data => {
+      res.status(201).json(data);
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: error.message
+      });
+    });
+});
+
+router.put('/:id', [validateAction], (req, res) => {
+  Actions.update(req.params.id, req.body)
+    .then(data => {
+      res.status(200).json(data);
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({
+        message: 'Error updating the action',
+      });
+    });
+});
+
+router.delete('/:id', (req, res) => {
+  Actions.remove(req.params.id)
+    .then(data => {
+      res.status(204).end();
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(500).json({
+        message: 'Error removing the hub',
+      });
+    });
+});
+
+
 
 module.exports = router;
